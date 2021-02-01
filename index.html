@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SW TEST</title>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@17/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+    ></script>
+
+    <script type="text/javascript">
+      // Step 1: Register a service worker
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").then(
+            function (registration) {
+              // Registration was successful
+              console.log(
+                "ServiceWorker registration successful with scope: ",
+                registration.scope
+              );
+            },
+            function (err) {
+              // registration failed :(
+              console.log("ServiceWorker registration failed: ", err);
+            }
+          );
+        });
+      }
+    </script>
+
+    <script type="text/babel">
+      const List = () => {
+        const [data, setData] = React.useState([]);
+        const [refresh, setRefresh] = React.useState(false);
+        const [loading, setLoading] = React.useState(false);
+        React.useEffect(() => {
+          setLoading(true);
+          fetch("https://jsonplaceholder.typicode.com/todos")
+            .then((response) => response.json())
+            .then((json) => {
+              setData(json);
+              setLoading(false);
+            });
+        }, [refresh]);
+
+        return (
+          <React.Fragment>
+            <button onClick={(e) => setRefresh((r) => !r)}>Refresh</button>
+            {loading ? (
+              <div>Loading...</div>
+            ) : (
+              <ol>
+                {data.map(({ id, title }) => (
+                  <li key={id}>{title}</li>
+                ))}
+              </ol>
+            )}
+          </React.Fragment>
+        );
+      };
+      ReactDOM.render(<List />, document.querySelector("#root"));
+    </script>
+  </head>
+  <body>
+    <h1>SW Test</h1>
+    <div id="root"></div>
+  </body>
+</html>
